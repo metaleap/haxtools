@@ -21,7 +21,7 @@ skipCopyingOf =
 
 
 main =
-    putStrLn ("\n") *> repoNames >>= (>>~ findSrcDirPath) >>= (>>~ proceedWith)
+    putStrLn ("\n") *> repoNames >>= (>>~ findSrcDirPath sourceDirPaths) >>= (>>~ proceedWith)
 
 repoNames =
     System.Environment.getArgs >>= cmdargs >>= (>>| isrepodir) where
@@ -29,13 +29,12 @@ repoNames =
         cmdargs names   = pure names
         isrepodir name  = System.Directory.doesDirectoryExist$ dirPathRepos </> name
 
-findSrcDirPath reponame =
-    find sourceDirPaths where
-        find [] = pure Nothing
-        find (thispath:rest) =
-            System.Directory.doesDirectoryExist (thispath </> reponame) >>= issrcdir where
-                issrcdir False  = find rest
-                issrcdir True   = pure$ Just (thispath </> reponame)
+findSrcDirPath [] _ =
+    pure Nothing
+findSrcDirPath (thisdir:moredirs) reponame =
+    System.Directory.doesDirectoryExist (thisdir </> reponame) >>= issrcdir where
+        issrcdir False  = findSrcDirPath moredirs reponame
+        issrcdir True   = pure$ Just (thisdir </> reponame)
 
 proceedWith Nothing =
     pure ()
