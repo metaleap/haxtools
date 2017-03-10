@@ -21,7 +21,7 @@ skipCopyingOf =
 
 
 main =
-    putStrLn ("\n") *> repoNames >>= (>>~ findSrcDirPath sourceDirPaths) >>= (>>~ proceedWith)
+    repoNames >>= (>>~ findSrcDirPath sourceDirPaths) >>= (>>~ proceedWith)
 
 repoNames =
     System.Environment.getArgs >>= cmdargs >>= (>>| isrepodir) where
